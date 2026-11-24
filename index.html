@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voicsky Promoter Tracker</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--fg:#14171f;--muted:#5d6574;--line:#e2e5ea;--accent:#2457e6;--accent-fg:#fff;--good:#14804a;--goodbg:#e3f5ea;--warn:#a15c00;--warnbg:#fff1d6;--t5:#7a3cff;--t3:#2457e6;--t2:#0f8a8a;--t0:#7b8190;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0f1218;--card:#181c25;--fg:#eceff5;--muted:#9aa3b5;--line:#2a303c;--accent:#6c93ff;--accent-fg:#0b1020;--good:#4cd08a;--goodbg:#12301f;--warn:#f0b24a;--warnbg:#34280f;--t5:#b394ff;--t3:#7ea1ff;--t2:#4fd0d0;--t0:#8b93a5}}
+:root[data-theme="dark"]{--bg:#0f1218;--card:#181c25;--fg:#eceff5;--muted:#9aa3b5;--line:#2a303c;--accent:#6c93ff;--accent-fg:#0b1020;--good:#4cd08a;--goodbg:#12301f;--warn:#f0b24a;--warnbg:#34280f;--t5:#b394ff;--t3:#7ea1ff;--t2:#4fd0d0;--t0:#8b93a5}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+main{max-width:720px;margin:0 auto;padding:12px 14px 40px}
+h1{font-size:1.2rem;margin:4px 0 10px}
+h2{font-size:1rem;margin:18px 0 8px}
+.tabs{display:flex;gap:6px;margin-bottom:12px}
+.tabs button{flex:1;padding:11px;border:1px solid var(--line);background:var(--card);color:var(--fg);border-radius:10px;font-weight:600;font-size:.95rem}
+.tabs button.on{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;margin-bottom:12px}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>label{flex:1;min-width:120px;font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+input,select{font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--fg);width:100%}
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.stat{background:var(--bg);border-radius:12px;padding:10px 12px}
+.stat small{color:var(--muted);display:block;font-size:.75rem}
+.stat b{font-size:1.4rem}
+.stat.total{grid-column:1/-1;background:var(--accent);color:var(--accent-fg)}
+.stat.total small{color:inherit;opacity:.85}
+.stat.total b{font-size:1.8rem}
+.bar{height:12px;background:var(--line);border-radius:99px;overflow:hidden;margin:10px 0 6px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s}
+.bar.hit i{background:var(--good)}
+.msg{font-size:.9rem;padding:8px 10px;border-radius:10px;background:var(--warnbg);color:var(--warn)}
+.msg.hit{background:var(--goodbg);color:var(--good)}
+.tier{display:flex;align-items:center;gap:8px;margin:14px 0 8px;font-weight:700}
+.pill{padding:2px 10px;border-radius:99px;color:#fff;font-size:.8rem}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+.m{position:relative;min-height:56px;padding:8px 10px;text-align:left;border:1px solid var(--line);border-left-width:5px;border-radius:12px;background:var(--card);color:var(--fg);font:inherit;font-size:.9rem;font-weight:600}
+.m:active{transform:scale(.97)}
+.m span{display:block;font-weight:400;color:var(--muted);font-size:.75rem}
+.m em{position:absolute;right:8px;top:8px;font-style:normal;background:var(--accent);color:var(--accent-fg);border-radius:99px;min-width:24px;text-align:center;font-size:.8rem;padding:1px 6px}
+.btn{padding:10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font:inherit;font-weight:600}
+.btn.danger{color:#c4302b}
+ul.log{list-style:none;margin:0;padding:0}
+ul.log li{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--line)}
+ul.log li:last-child{border:0}
+ul.log .n{color:var(--muted);width:28px}
+ul.log .t{color:var(--muted);font-size:.8rem}
+ul.log .g{flex:1}
+ul.log button{border:0;background:none;color:#c4302b;font-size:1.2rem;padding:6px 10px}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{color:var(--muted);font-size:.75rem;text-transform:uppercase}
+td.r,th.r{text-align:right}
+.big{font-size:1.6rem;font-weight:800}
+.hide{display:none}
+.btn.primary{background:var(--accent);color:var(--accent-fg);border-color:var(--accent)}
+.snap{width:100%;min-height:56px;font-size:1.05rem;margin-bottom:12px}
+.pend{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--line)}
+.pend img{width:56px;height:56px;object-fit:cover;border-radius:8px;background:var(--line)}
+.pend .g{flex:1;font-size:.9rem}
+.pend .g span{display:block;color:var(--muted);font-size:.75rem}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.55);display:flex;align-items:flex-end;justify-content:center;z-index:20}
+.modal.hide{display:none}
+.sheet{background:var(--card);width:100%;max-width:720px;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom,0px));max-height:92vh;overflow:auto}
+.sheet img{width:100%;max-height:42vh;object-fit:contain;border-radius:10px;background:var(--bg);margin-bottom:10px}
+.sheet label{display:block;font-size:.8rem;color:var(--muted);margin:10px 0 4px}
+.err{color:#c4302b;font-size:.85rem;min-height:1.2em;margin-top:6px}
+.sn{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.8rem}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 16px;border-radius:99px;font-size:.9rem;opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<main>
+<h1>🎧 Voicsky Promoter Tracker</h1>
+<div class="tabs"><button id="tT" class="on">Tracker</button><button id="tS">Commission scheme</button></div>
+
+<section id="vT">
+ <div class="card">
+  <div class="row">
+   <label>Your name<input id="name" placeholder="e.g. Kai" autocomplete="off"></label>
+   <label>Date<input id="date" type="date"></label>
+   <label>Personal target (units)<input id="target" type="number" min="1" inputmode="numeric"></label>
+   <label id="lPin" class="hide">Team PIN<input id="pin" type="password" autocomplete="off" inputmode="numeric"></label>
+  </div>
+ </div>
+ <div class="card">
+  <div class="stats">
+   <div class="stat"><small>Units sold</small><b id="sUnits">0</b></div>
+   <div class="stat"><small>Commission</small><b id="sComm">RM0</b></div>
+   <div class="stat"><small>Target bonus</small><b id="sBonus">RM0</b></div>
+   <div class="stat"><small>Base pay</small><b id="sBase">RM0</b></div>
+   <div class="stat total"><small>Total earned today</small><b id="sTotal">RM0</b></div>
+  </div>
+  <div class="bar" id="bar"><i id="barI"></i></div>
+  <div class="msg" id="msg"></div>
+  <p id="sync" class="hide" style="margin:8px 0 0;font-size:.85rem;color:var(--muted)"></p>
+ </div>
+ <button class="btn primary snap" id="snap">📷 Snap serial photo (log later)</button>
+ <input id="file" type="file" accept="image/*" capture="environment" class="hide">
+ <div class="card hide" id="pendCard"><b id="pendT"></b><div id="pend"></div></div>
+ <h2>Or tap a model to log a sale now</h2>
+ <input id="q" type="search" placeholder="Search model…" autocomplete="off">
+ <div id="grid"></div>
+ <h2>Today’s sales</h2>
+ <div class="card">
+  <ul class="log" id="log"></ul>
+  <div class="row" style="margin-top:10px">
+   <button class="btn" id="undo">Undo last</button>
+   <button class="btn" id="copy">Copy summary</button>
+   <button class="btn danger" id="clear">Clear day</button>
+  </div>
+ </div>
+</section>
+
+<section id="vS" class="hide">
+ <div class="card">
+  <h2 style="margin-top:0">Daily pay</h2>
+  <table>
+   <tr><td>Base pay (each day you work)</td><td class="r"><b>RM130</b></td></tr>
+   <tr><td>Target bonus (hit your daily unit target)</td><td class="r"><b>RM20</b></td></tr>
+   <tr><td>Commission per unit sold</td><td class="r"><b>RM0–5</b></td></tr>
+  </table>
+  <p style="color:var(--muted);font-size:.9rem;margin-bottom:0">Total pay = base pay + commission + target bonus (if earned). Every sale must be logged with the unit’s serial number to count.</p>
+ </div>
+ <div class="card">
+  <h2 style="margin-top:0">Personal daily unit targets</h2>
+  <table>
+   <tr><th>Day</th><th class="r">Target</th></tr>
+   <tr><td>Wed 25 Nov</td><td class="r">20 units</td></tr>
+   <tr><td>Thu 26 Nov</td><td class="r">20 units</td></tr>
+   <tr><td>Fri 27 Nov</td><td class="r">25 units</td></tr>
+   <tr><td>Sat 28 Nov</td><td class="r">25 units</td></tr>
+   <tr><td>Sun 29 Nov</td><td class="r">30 units</td></tr>
+   
+   
+  </table>
+  <p style="color:var(--muted);font-size:.9rem;margin-bottom:0">Your manager sets these daily targets. You can still edit your target on the Tracker tab. Hit the target or higher to earn the RM20 bonus.</p>
+ </div>
+ <div class="card">
+  <h2 style="margin-top:0">Commission per unit</h2>
+  <div id="rates"></div>
+ </div>
+</section>
+</main>
+<div class="modal hide" id="modal"><div class="sheet">
+ <b id="mTitle" style="font-size:1.1rem"></b>
+ <img id="mImg" class="hide" alt="Serial photo">
+ <div id="mSel" class="hide"><label for="mModel">Model</label><select id="mModel"></select></div>
+ <label for="mSn">Serial number</label>
+ <input id="mSn" autocomplete="off" autocapitalize="characters" placeholder="Type the serial number">
+ <div class="err" id="mErr"></div>
+ <div class="row" style="margin-top:8px"><button class="btn primary" id="mSave" style="flex:1">Save sale</button><button class="btn" id="mCancel">Cancel</button></div>
+ <button class="btn danger hide" id="mDel" style="width:100%;margin-top:10px">Discard this photo</button>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const BASE=130,BONUS=20;
+const MODELS=[["Echo 96",3],["Echo 75",3],["Aeros",3],["Ultra Thin Glass Pad (1mm)",3],["Pulse 96",3],["Pulse 75",3],["Apex 75",3],["Atmos 87",3],["Nimbus 65",3],["Tune 65",3],["Super Thin Glass Pad (1.5mm)",3],["Cloud S1",2],["Cloud S2",2],["Ventus XL",0],["Ventus XXL",0],["Amplify XL",0],["Amplify XXL",0]];
+const RATE=Object.fromEntries(MODELS);
+const FAMILIES=[["Echo, Pulse, Apex, Atmos, Nimbus, Tune, Aeros, Glass Pads (Super Thin, Ultra Thin)",3],["Cloud S1 / S2 series",2],["Ventus / Amplify",0]];
+const TIERS=[3,2,0];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const KEY="voicsky_tracker_v1";
+let S={name:"",days:{}},mem=null;
+function load(){try{const r=localStorage.getItem(KEY);if(r)S=JSON.parse(r)}catch(e){if(mem)S=mem}}
+function save(){mem=S;try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function today(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+const KPI={"2026-11-25":20,"2026-11-26":20,"2026-11-27":25,"2026-11-28":25,"2026-11-29":30};
+function defTarget(ds){if(KPI[ds])return KPI[ds];const w=new Date(ds+"T00:00:00").getDay();return w===6?22:w===0?25:15}
+function day(){const ds=$("date").value;if(!S.days[ds])S.days[ds]={target:defTarget(ds),sales:[],pending:[]};const d=S.days[ds];if(!d.pending)d.pending=[];return d}
+function toast(t){const e=$("toast");e.textContent=t;e.classList.add("on");setTimeout(()=>e.classList.remove("on"),1600)}
+function calc(){const d=day(),u=d.sales.length,c=d.sales.reduce((a,s)=>a+s.r,0),hit=u>0&&u>=d.target,b=hit?BONUS:0,base=u>0?BASE:0;return{d,u,c,hit,b,base,total:c+b+base}}
+function render(){
+ const x=calc(),d=x.d;
+ $("target").value=d.target;
+ $("sUnits").textContent=x.u;$("sComm").textContent="RM"+x.c;$("sBonus").textContent="RM"+x.b;$("sBase").textContent="RM"+x.base;$("sTotal").textContent="RM"+x.total;
+ $("barI").style.width=Math.min(100,x.u/d.target*100)+"%";
+ $("bar").classList.toggle("hit",x.hit);$("msg").classList.toggle("hit",x.hit);
+ $("msg").textContent=x.hit?"Target hit! RM"+BONUS+" bonus unlocked 🎉 ("+x.u+" / "+d.target+" units)":(d.target-x.u)+" more unit"+(d.target-x.u===1?"":"s")+" to unlock the RM"+BONUS+" bonus ("+x.u+" / "+d.target+")";
+ grid();
+ pendRender();syncUi();
+ const L=$("log");
+ L.innerHTML=d.sales.length?d.sales.map((s,i)=>'<li><span class="n">'+(i+1)+'</span><span class="g">'+esc(s.m)+' <span class="t">'+esc(s.t)+'</span><br><span class="sn">'+esc(s.sn||"no serial")+'</span></span><b>RM'+s.r+'</b><button data-i="'+i+'" aria-label="Delete sale">×</button></li>').reverse().join(""):'<li style="color:var(--muted)">No sales logged yet.</li>';
+}
+function grid(){
+ const q=$("q").value.trim().toLowerCase(),d=day(),cnt={};
+ d.sales.forEach(s=>cnt[s.m]=(cnt[s.m]||0)+1);
+ let h="";
+ TIERS.forEach(t=>{
+  const ms=MODELS.filter(m=>m[1]===t&&m[0].toLowerCase().includes(q));
+  if(!ms.length)return;
+  h+='<div class="tier"><span class="pill" style="background:var(--t'+t+')">'+(t?"RM"+t+" per unit":"No commission")+'</span></div><div class="grid">'+ms.map(m=>'<button class="m" style="border-left-color:var(--t'+t+')" data-m="'+esc(m[0])+'">'+esc(m[0])+'<span>RM'+m[1]+'</span>'+(cnt[m[0]]?'<em>'+cnt[m[0]]+'</em>':'')+'</button>').join("")+'</div>';
+ });
+ $("grid").innerHTML=h||'<p style="color:var(--muted)">No matching model.</p>';
+}
+function rates(){
+ $("rates").innerHTML=FAMILIES.map(f=>'<p style="margin:0 0 6px"><b>'+(f[1]?"RM"+f[1]:"RM0")+'</b> — '+esc(f[0])+'</p>').join("")+
+ '<table style="margin-top:10px"><tr><th>Model</th><th class="r">RM / unit</th></tr>'+MODELS.map(m=>'<tr><td>'+esc(m[0])+'</td><td class="r">'+m[1]+'</td></tr>').join("")+'</table>';
+}
+function tab(v){$("vT").classList.toggle("hide",v!=="T");$("vS").classList.toggle("hide",v!=="S");$("tT").classList.toggle("on",v==="T");$("tS").classList.toggle("on",v==="S");window.scrollTo(0,0)}
+function summary(){
+ const x=calc(),by={};x.d.sales.forEach(s=>by[s.m]=(by[s.m]||0)+1);
+ return (S.name||"Promoter")+" — "+$("date").value+"\nUnits: "+x.u+" / target "+x.d.target+"\n"+x.d.sales.map((s,i)=>(i+1)+". "+s.m+" – SN "+(s.sn||"-")).join("\n")+(x.d.pending.length?"\nNot yet logged: "+x.d.pending.length+" photo(s)":"")+"\nCommission: RM"+x.c+"\nTarget bonus: RM"+x.b+"\nBase pay: RM"+x.base+"\nTotal: RM"+x.total;
+}
+load();
+const PH={};let curP=null,curM=null;
+function idb(){return new Promise((res,rej)=>{try{const r=indexedDB.open("voicsky_photos",1);r.onupgradeneeded=()=>r.result.createObjectStore("p");r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error)}catch(e){rej(e)}})}
+async function putP(id,v){PH[id]=v;try{const db=await idb();await new Promise((res,rej)=>{const t=db.transaction("p","readwrite");t.objectStore("p").put(v,id);t.oncomplete=res;t.onerror=()=>rej(t.error)});return true}catch(e){return false}}
+async function getP(id){if(PH[id])return PH[id];try{const db=await idb();const v=await new Promise((res,rej)=>{const q=db.transaction("p").objectStore("p").get(id);q.onsuccess=()=>res(q.result);q.onerror=()=>rej(q.error)});if(v)PH[id]=v;return v||""}catch(e){return ""}}
+async function delP(id){delete PH[id];try{const db=await idb();db.transaction("p","readwrite").objectStore("p").delete(id)}catch(e){}}
+function shrink(f){return new Promise((res,rej)=>{const u=URL.createObjectURL(f),im=new Image();im.onload=()=>{const k=Math.min(1,1280/Math.max(im.width,im.height)),c=document.createElement("canvas");c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext("2d").drawImage(im,0,0,c.width,c.height);URL.revokeObjectURL(u);res(c.toDataURL("image/jpeg",.75))};im.onerror=()=>{URL.revokeObjectURL(u);rej()};im.src=u})}
+function nowT(){return new Date().toLocaleTimeString([],{hour:"2-digit",minute:"2-digit"})}
+function pendRender(){
+ const d=day(),n=d.pending.length;
+ $("pendCard").classList.toggle("hide",!n);
+ $("pendT").textContent="📷 "+n+" photo"+(n===1?"":"s")+" waiting to be logged (not counted yet)";
+ $("pend").innerHTML=d.pending.map(p=>'<div class="pend"><img data-p="'+esc(p.id)+'" alt=""><div class="g">Snapped '+esc(p.t)+'<span>Tap Log to add model and serial</span></div><button class="btn" data-pid="'+esc(p.id)+'">Log</button></div>').join("");
+ $("pend").querySelectorAll("img").forEach(im=>getP(im.dataset.p).then(v=>{if(v)im.src=v}));
+}
+function serialTaken(sn){const k=sn.toUpperCase();return Object.values(S.days).some(d=>d.sales.some(s=>(s.sn||"").toUpperCase()===k))}
+async function openSale(m,pid){
+ curP=pid;curM=m;$("mErr").textContent="";$("mSn").value="";
+ const isP=!!pid;
+ $("mSel").classList.toggle("hide",!isP);$("mImg").classList.toggle("hide",!isP);$("mDel").classList.toggle("hide",!isP);
+ $("mTitle").textContent=isP?"Log photographed unit":m+" – RM"+RATE[m];
+ if(isP)$("mModel").innerHTML='<option value="">Choose model…</option>'+MODELS.map(x=>'<option>'+esc(x[0])+'</option>').join("");
+ $("modal").classList.remove("hide");
+ setTimeout(()=>$("mSn").focus(),60);
+ if(isP)$("mImg").src=await getP(pid);
+}
+function closeM(){$("modal").classList.add("hide");curP=null}
+$("mSave").onclick=()=>{
+ const m=curP?$("mModel").value:curM,sn=$("mSn").value.trim();
+ if(ENDPOINT&&!(S.name||"").trim()){$("mErr").textContent="Enter your name at the top first.";return}
+ if(ENDPOINT&&!(S.pin||"").trim()){$("mErr").textContent="Enter the team PIN at the top first.";return}
+ if(!m){$("mErr").textContent="Choose the model.";return}
+ if(!sn){$("mErr").textContent="Enter the serial number.";return}
+ if(serialTaken(sn)){$("mErr").textContent="This serial number is already logged.";return}
+ const d=day(),s={m:m,r:RATE[m],sn:sn,t:nowT(),id:"s"+Date.now()+Math.random().toString(36).slice(2,6),dt:$("date").value,n:S.name||""};
+ if(curP){const i=d.pending.findIndex(p=>p.id===curP);if(i>-1){s.t=d.pending[i].t;s.p=curP;d.pending.splice(i,1)}}
+ d.sales.push(s);save();closeM();render();sync();
+ if(navigator.vibrate)try{navigator.vibrate(20)}catch(_){}
+};
+$("mSn").onkeydown=e=>{if(e.key==="Enter")$("mSave").click()};
+$("mCancel").onclick=closeM;
+$("modal").onclick=e=>{if(e.target.id==="modal")closeM()};
+$("mDel").onclick=()=>{if(!curP||!confirm("Discard this photo?"))return;const d=day();d.pending=d.pending.filter(p=>p.id!==curP);delP(curP);save();closeM();render()};
+$("pend").onclick=e=>{const r=e.target.closest(".pend");if(r)openSale(null,r.querySelector("[data-pid]").dataset.pid)};
+$("snap").onclick=()=>$("file").click();
+$("file").onchange=async e=>{const f=e.target.files[0];e.target.value="";if(!f)return;try{const v=await shrink(f),id="p"+Date.now()+Math.random().toString(36).slice(2,6),ok=await putP(id,v);day().pending.push({id:id,t:nowT()});save();render();toast(ok?"Photo saved – log it when you’re free":"Photo kept for this session only")}catch(x){toast("Couldn’t read that photo")}};
+const ENDPOINT="https://script.google.com/macros/s/AKfycbyNHdHhm9f1ZoAHcrvgDvj1ksG0b8-CcnJEd6MTtF-UGkBr5yg4ittUy1WJtnBT-xLVqQ/exec";
+let syncing=false,syncErr="";
+function unsynced(){const a=[];Object.values(S.days).forEach(d=>d.sales.forEach(s=>{if(s.id&&!s.sy)a.push(s)}));return a}
+function syncUi(){
+ const e=$("sync");
+ if(!ENDPOINT){e.classList.add("hide");return}
+ $("lPin").classList.remove("hide");e.classList.remove("hide");
+ const n=unsynced().length;
+ e.textContent=syncErr||(n?n+" sale"+(n===1?"":"s")+" waiting to upload to the sheet":"All sales saved to the sheet ✓");
+}
+async function sync(){
+ if(!ENDPOINT||syncing||!navigator.onLine)return;
+ syncing=true;syncErr="";
+ try{
+  for(const s of unsynced()){
+   const body={pin:S.pin||"",id:s.id,date:s.dt,time:s.t,name:s.n,model:s.m,rate:s.r,sn:s.sn,photo:s.p?await getP(s.p):""};
+   const r=await fetch(ENDPOINT,{method:"POST",body:JSON.stringify(body)});
+   const j=await r.json();
+   if(j.ok){s.sy=1;save()}
+   else if(j.err==="dup"){s.sy=2;save();syncErr="A serial number was already in the sheet – tell your manager"}
+   else{syncErr=j.err==="Wrong PIN"?"Wrong team PIN – check it at the top":"Sheet says: "+j.err;break}
+  }
+ }catch(e){}
+ syncing=false;syncUi();
+}
+$("name").value=S.name||"";$("date").value=today();rates();render();
+$("pin").value=S.pin||"";$("pin").oninput=e=>{S.pin=e.target.value;save();syncErr=""};
+window.addEventListener("online",sync);setInterval(sync,30000);sync();
+$("name").oninput=e=>{S.name=e.target.value;save()};
+$("date").onchange=()=>{if(!$("date").value)$("date").value=today();render()};
+$("target").onchange=e=>{const v=parseInt(e.target.value,10);day().target=v>0?v:defTarget($("date").value);save();render()};
+$("q").oninput=grid;
+$("grid").onclick=e=>{const b=e.target.closest("[data-m]");if(!b)return;openSale(b.dataset.m,null)};
+$("log").onclick=e=>{const b=e.target.closest("[data-i]");if(!b)return;const r=day().sales.splice(+b.dataset.i,1)[0];if(r&&r.p)delP(r.p);save();render()};
+$("undo").onclick=()=>{const d=day();if(d.sales.length){const r=d.sales.pop();if(r&&r.p)delP(r.p);save();render();toast("Last sale removed")}};
+$("clear").onclick=()=>{const d=day();if((d.sales.length||d.pending.length)&&confirm("Clear all sales and waiting photos for this day?")){d.pending.forEach(p=>delP(p.id));d.sales.forEach(s=>{if(s.p)delP(s.p)});d.sales=[];d.pending=[];save();render()}};
+$("copy").onclick=async()=>{try{await navigator.clipboard.writeText(summary());toast("Summary copied")}catch(e){toast("Copy not available on this device")}};
+$("tT").onclick=()=>tab("T");$("tS").onclick=()=>tab("S");
+</script>
+</body>
+</html>
